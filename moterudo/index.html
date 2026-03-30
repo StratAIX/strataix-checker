@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>好かれ度チェッカー — あなたは何タイプ？</title>
+<meta name="description" content="12の質問で分かる、あなたの「好かれ方」のタイプ。無料・登録不要。">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --pink:   #e03a90;
+  --pink2:  #c02878;
+  --yellow: #f0a000;
+  --cyan:   #0090a0;
+  --purple: #8050e8;
+  --bg:     #fff8fb;
+  --bg2:    #fef1f7;
+  --text:   #1a0e15;
+  --gray1:  #7a5568;
+  --gray2:  #c090a8;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(224,58,144,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224,58,144,.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+section { position: relative; z-index: 1; }
+
+/* HERO */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px 80px;
+  text-align: center;
+}
+.hero-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(224,58,144,.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border: 1px solid rgba(224,58,144,.4);
+  border-radius: 20px;
+  background: rgba(224,58,144,.07);
+  color: var(--pink);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  margin-bottom: 32px;
+}
+.hero-badge::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--pink);
+  box-shadow: 0 0 8px var(--pink);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+.hero-emoji { font-size: clamp(48px,8vw,80px); margin-bottom: 16px; }
+.hero-title {
+  font-size: clamp(30px, 6vw, 60px);
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.hero-title .accent {
+  background: linear-gradient(90deg, var(--pink) 0%, #ff90c8 60%, #c040a0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: clamp(15px, 2.5vw, 20px);
+  color: var(--gray1);
+  margin-bottom: 40px;
+  line-height: 1.7;
+}
+.hero-types {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 48px;
+  max-width: 560px;
+}
+.type-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--bg2);
+  border: 1px solid rgba(30,14,21,.1);
+  font-size: 13px;
+  color: var(--gray1);
+}
+.btn-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 52px;
+  background: linear-gradient(135deg, var(--pink) 0%, var(--pink2) 100%);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 900;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  letter-spacing: .04em;
+  box-shadow: 0 0 32px rgba(224,58,144,.3);
+  transition: transform .2s, box-shadow .2s;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.btn-start:hover { transform: translateY(-3px); box-shadow: 0 8px 40px rgba(224,58,144,.45); }
+.btn-start::after { content: '→'; font-size: 20px; }
+.hero-meta { margin-top: 24px; font-size: 13px; color: var(--gray2); }
+.hero-meta span { margin: 0 10px; }
+
+/* QUIZ */
+#quiz { display: none; min-height: 100vh; padding: 40px 24px 80px; max-width: 680px; margin: 0 auto; }
+.progress-wrap { margin-bottom: 36px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray2); margin-bottom: 8px; }
+.progress-label .axis-label { color: var(--pink); font-weight: 700; }
+.progress-bar-bg { height: 4px; background: rgba(30,14,21,.1); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--pink), var(--yellow)); border-radius: 2px; transition: width .4s ease; }
+.question-card {
+  background: var(--bg2);
+  border: 1px solid rgba(30,14,21,.1);
+  border-radius: 20px;
+  padding: 36px 32px;
+  margin-bottom: 24px;
+  animation: fadeUp .35s ease;
+  box-shadow: 0 2px 16px rgba(224,58,144,.06);
+}
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+.question-num { font-size: 12px; font-weight: 700; color: var(--pink); letter-spacing: .1em; margin-bottom: 14px; }
+.question-text { font-size: clamp(17px, 2.5vw, 21px); font-weight: 700; line-height: 1.6; color: var(--text); }
+.options { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
+.option-btn {
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(224,58,144,.04);
+  border: 1px solid rgba(30,14,21,.1);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .1s;
+  line-height: 1.5;
+}
+.option-btn:hover { background: rgba(224,58,144,.1); border-color: rgba(224,58,144,.5); transform: translateX(4px); }
+.option-btn.selected { background: rgba(224,58,144,.12); border-color: var(--pink); color: var(--pink); }
+.quiz-nav { display: flex; justify-content: flex-start; margin-top: 8px; }
+.btn-back { padding: 10px 20px; background: transparent; border: 1px solid rgba(30,14,21,.15); border-radius: 8px; color: var(--gray2); font-size: 14px; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; transition: border-color .15s, color .15s; }
+.btn-back:hover { border-color: var(--gray1); color: var(--gray1); }
+.btn-back:disabled { opacity: .3; cursor: default; }
+
+/* RESULT */
+#result { display: none; padding: 60px 24px 100px; max-width: 680px; margin: 0 auto; animation: fadeUp .5s ease; }
+.result-header { text-align: center; margin-bottom: 40px; }
+.result-label { font-size: 12px; font-weight: 700; letter-spacing: .12em; color: var(--pink); margin-bottom: 16px; }
+.result-icon { font-size: 72px; line-height: 1; margin-bottom: 16px; filter: drop-shadow(0 0 16px rgba(224,58,144,.3)); }
+.result-name { font-size: clamp(28px, 5vw, 42px); font-weight: 900; margin-bottom: 8px; }
+.result-score-wrap { margin-top: 16px; display: flex; justify-content: center; }
+.result-score-badge { padding: 8px 20px; border-radius: 20px; background: rgba(224,58,144,.08); border: 1px solid rgba(224,58,144,.25); color: var(--pink); font-size: 14px; font-weight: 700; }
+.result-card { background: var(--bg2); border: 1px solid rgba(30,14,21,.1); border-radius: 20px; padding: 32px; margin-bottom: 20px; box-shadow: 0 2px 16px rgba(224,58,144,.06); }
+.result-card h3 { font-size: 12px; font-weight: 700; letter-spacing: .1em; color: var(--gray2); margin-bottom: 12px; text-transform: uppercase; }
+.result-card p { font-size: 16px; color: var(--gray1); line-height: 1.8; }
+.result-strength { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 8px 16px; background: rgba(224,58,144,.07); border-radius: 8px; font-size: 14px; color: var(--pink); font-weight: 700; }
+.result-strength::before { content: '✨'; }
+.result-next { display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: rgba(128,80,232,.05); border: 1px solid rgba(128,80,232,.18); border-radius: 12px; margin-top: 16px; font-size: 14px; color: var(--gray1); line-height: 1.6; }
+.result-next::before { content: '→'; color: var(--purple); font-weight: 900; flex-shrink: 0; margin-top: 1px; }
+.share-area { background: var(--bg2); border: 1px solid rgba(30,14,21,.1); border-radius: 20px; padding: 28px 32px; margin-bottom: 20px; text-align: center; box-shadow: 0 2px 16px rgba(224,58,144,.06); }
+.share-area h3 { font-size: 14px; font-weight: 700; color: var(--gray1); margin-bottom: 20px; }
+canvas#shareCard { width: 100%; max-width: 480px; border-radius: 12px; display: block; margin: 0 auto 20px; box-shadow: 0 4px 32px rgba(224,58,144,.15); }
+.share-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-x { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #000; border: 1px solid rgba(255,255,255,.2); border-radius: 50px; color: #fff; font-size: 14px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; text-decoration: none; transition: background .15s; }
+.btn-x:hover { background: #111; }
+.btn-dl { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: rgba(224,58,144,.08); border: 1px solid rgba(224,58,144,.25); border-radius: 50px; color: var(--pink); font-size: 14px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; transition: background .15s; }
+.btn-dl:hover { background: rgba(224,58,144,.16); }
+.sinc-cta { background: linear-gradient(135deg, rgba(224,58,144,.05) 0%, rgba(128,80,232,.07) 100%); border: 1px solid rgba(224,58,144,.2); border-radius: 24px; padding: 36px 32px; text-align: center; margin-bottom: 20px; position: relative; overflow: hidden; }
+.sinc-cta::before { content: ''; position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(224,58,144,.08) 0%, transparent 70%); pointer-events: none; }
+.sinc-logo-text { font-size: 28px; font-weight: 900; background: linear-gradient(90deg, var(--pink), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -.02em; margin-bottom: 8px; }
+.sinc-tagline { font-size: 13px; color: var(--pink); font-weight: 700; letter-spacing: .06em; margin-bottom: 16px; }
+.sinc-desc { font-size: 15px; color: var(--gray1); line-height: 1.7; margin-bottom: 24px; }
+.sinc-desc strong { color: var(--text); font-weight: 700; }
+.btn-sinc { display: inline-flex; align-items: center; gap: 10px; padding: 16px 40px; background: linear-gradient(135deg, var(--pink) 0%, var(--pink2) 100%); color: #fff; font-size: 16px; font-weight: 900; font-family: 'Noto Sans JP', sans-serif; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; box-shadow: 0 0 24px rgba(224,58,144,.25); transition: transform .2s, box-shadow .2s; }
+.btn-sinc:hover { transform: translateY(-2px); box-shadow: 0 6px 32px rgba(224,58,144,.4); }
+.btn-sinc::after { content: '→'; }
+.strataix-footer { text-align: center; padding-top: 8px; }
+.strataix-footer a { font-size: 12px; color: var(--gray2); text-decoration: none; transition: color .15s; }
+.strataix-footer a:hover { color: var(--gray1); }
+.btn-retry { display: block; margin: 20px auto 0; padding: 12px 32px; background: transparent; border: 1px solid rgba(30,14,21,.15); border-radius: 50px; color: var(--gray2); font-size: 14px; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; transition: border-color .15s, color .15s; }
+.btn-retry:hover { border-color: var(--gray1); color: var(--gray1); }
+
+/* DESKTOP SHARE MODAL */
+#shareModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(30,14,21,.55);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+#shareModal.open { display: flex; }
+.share-modal-box {
+  background: #fff;
+  border: 1px solid rgba(224,58,144,.25);
+  border-radius: 24px;
+  padding: 36px 32px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 12px 56px rgba(224,58,144,.18);
+  animation: fadeUp .25s ease;
+}
+.share-modal-icon { font-size: 48px; margin-bottom: 14px; }
+.share-modal-title { font-size: 18px; font-weight: 900; color: var(--text); margin-bottom: 10px; }
+.share-modal-desc { font-size: 14px; color: var(--gray1); line-height: 1.8; margin-bottom: 8px; }
+.share-modal-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(224,58,144,.07);
+  border: 1px solid rgba(224,58,144,.2);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pink);
+  margin-bottom: 20px;
+}
+.share-modal-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--pink) 0%, var(--pink2) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 900;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(224,58,144,.3);
+  transition: transform .15s, box-shadow .15s;
+}
+.share-modal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(224,58,144,.4); }
+
+@media (max-width: 480px) { .question-card, .result-card, .share-area, .sinc-cta { padding: 24px 20px; } .hero-types { display: none; } }
+
+/* アクセシビリティ */
+.btn-start:focus-visible,
+.option-btn:focus-visible,
+.btn-back:focus-visible,
+.btn-x:focus-visible,
+.btn-dl:focus-visible,
+.btn-sinc:focus-visible,
+.btn-retry:focus-visible,
+.share-modal-btn:focus-visible {
+  outline: 3px solid var(--pink);
+  outline-offset: 3px;
+}
+button { touch-action: manipulation; }
+.hero-title { text-wrap: balance; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Desktop share modal -->
+<div id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+  <div class="share-modal-box">
+    <div class="share-modal-icon">📋</div>
+    <div class="share-modal-title" id="shareModalTitle">画像をコピーしました！</div>
+    <div class="share-modal-desc">このままXの投稿画面が開きます。</div>
+    <div class="share-modal-hint">📌 画像をペーストするだけで完成！</div>
+    <button class="share-modal-btn" onclick="closeShareModal()">OK、Xを開く →</button>
+  </div>
+</div>
+
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge">POPULAR CHECKER</div>
+  <div class="hero-emoji">🌟</div>
+  <h1 class="hero-title">あなた、思ってるより<br><span class="accent">好かれてます。</span></h1>
+  <p class="hero-sub">12問で証明します。あなたが人に好かれる<br>「本当の理由」、知ってましたか？</p>
+  <div class="hero-types">
+    <span class="type-chip">🌟 天然好かれ型</span>
+    <span class="type-chip">💡 ムードメーカー型</span>
+    <span class="type-chip">🤝 深く好かれ型</span>
+    <span class="type-chip">🔮 謎の引力型</span>
+    <span class="type-chip">🦔 隠れた魅力型</span>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">診断スタート</button>
+  <p class="hero-meta"><span>無料</span><span>登録不要</span><span>12問・約2分</span></p>
+</section>
+
+<section id="quiz">
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span id="progressText">Q1 / 12</span>
+      <span class="axis-label">好かれ度チェッカー</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar" style="width:8.3%"></div>
+    </div>
+  </div>
+  <div id="questionArea"></div>
+  <div class="quiz-nav">
+    <button class="btn-back" id="btnBack" onclick="goBack()" disabled>← 戻る</button>
+  </div>
+</section>
+
+<section id="result">
+  <div class="result-header">
+    <div class="result-label">YOUR TYPE</div>
+    <div class="result-icon" id="resultIcon"></div>
+    <div class="result-name" id="resultName"></div>
+    <div class="result-score-wrap">
+      <span class="result-score-badge" id="resultScoreBadge"></span>
+    </div>
+  </div>
+  <div class="result-card">
+    <h3>タイプ解説</h3>
+    <p id="descText"></p>
+    <div class="result-strength" id="strengthText"></div>
+    <div class="result-next" id="nextText"></div>
+  </div>
+  <div class="share-area">
+    <h3>結果をシェアする</h3>
+    <canvas id="shareCard" width="1200" height="630"></canvas>
+    <div class="share-btns">
+      <button class="btn-dl" onclick="downloadCard()">⬇ 画像を保存</button>
+      <button class="btn-x" onclick="shareToX()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        Xでシェア
+      </button>
+    </div>
+  </div>
+  <div class="sinc-cta">
+    <div class="sinc-logo-text">Sinc</div>
+    <div class="sinc-tagline">性格診断 × マッチング</div>
+    <p class="sinc-desc" id="sincCtaDesc">あなたと<strong>相性のいい人</strong>、Sincにいます。<br>好かれ方が似た人と話すと、きっと居心地がいい。</p>
+    <a href="https://sinc.strataix.net" target="_blank" rel="noopener" class="btn-sinc">Sincで相性を確かめる</a>
+  </div>
+  <button class="btn-retry" onclick="retryQuiz()">もう一度診断する</button>
+  <div class="strataix-footer"><a href="https://strataix.net" target="_blank" rel="noopener">Made by StratAIX</a></div>
+</section>
+
+<script>
+const QUESTIONS = [
+  { id:1, q:'久しぶりに会った知人に言われやすいのは？',
+    opts:['「久しぶりすぎてなんか照れる」','「忙しそうだったんだね」','「なんか雰囲気変わった？」','「全然変わってないね、会いたかった！」'] },
+  { id:2, q:'グループでの会話、あなたの立ち位置は？',
+    opts:['静かに聞いていることが多い','質問して場をつなぐ役','うまくバランスをとる','自然と話の中心になりやすい'] },
+  { id:3, q:'初対面の人と話すとき、あなたは？',
+    opts:['どうしても緊張してしまう','相手に合わせて慎重に話す','共通点を見つけながら自然に話す','気づいたら打ち解けている'] },
+  { id:4, q:'誰かが落ち込んでいるとき、あなたは？',
+    opts:['後から「気づかなかった」と言われることがある','気づくが、タイミングを見計らう','気づいて、どう声をかけるか考える','自然に声をかけられる'] },
+  { id:5, q:'誰かに頼まれごとをされる頻度は？',
+    opts:['ほとんどない','たまにある','時々ある','よくある'] },
+  { id:6, q:'自分の「好きなもの・こと」を話すとき、あなたは？',
+    opts:['あまり人には話さない','話すけど控えめに','相手が興味ありそうなら話す','目を輝かせて話してしまう'] },
+  { id:7, q:'LINEやDMの返信について？',
+    opts:['かなり遅いと自覚している','時間がかかることが多い','基本的に返せている','早めに返すようにしている'] },
+  { id:8, q:'職場や学校で、名前を覚えてもらうのは？',
+    opts:['かなり時間がかかる','少し時間がかかる','普通くらい','早い方だと思う'] },
+  { id:9, q:'「あなたといると楽しい」と言われることは？',
+    opts:['ほとんどない','言われたことはある','時々ある','よくある'] },
+  { id:10, q:'人から「なんか面白い人だな」と言われることは？',
+    opts:['ほとんどない','たまに','時々ある','よく言われる'] },
+  { id:11, q:'連絡をくれる友人・知人の数は？',
+    opts:['少ない（自分から連絡することが多い）','数人いる','程よくいる','多い方だと思う'] },
+  { id:12, q:'「あなたはどんな人？」と聞かれたとき、あなたは？',
+    opts:['なんて答えればいいか分からない','「普通の人です」と言う','少し考えてから答える','すらっと自分らしく答えられる'] },
+];
+
+const TYPES = [
+  { minScore: 40, name: '天然好かれ型', icon: '🌟', color: '#c07000',
+    desc: '気づいたら周りに人がいる。特別なことをしているわけじゃないのに、自然と人が集まってくる。その無意識の温かさと明るさが、あなたの最大の武器だ。',
+    strength: '無意識にできる自然な親しみやすさ',
+    next: 'その魅力を意識的に使いこなすと、もっと広がる' },
+  { minScore: 33, name: 'ムードメーカー型', icon: '💡', color: '#b06000',
+    desc: '場の空気を自然に明るくできる人。あなたがいるだけで場が和む。リアクションの良さや笑いのセンスが、周囲に安心感を与えている。',
+    strength: '場の空気を作る力',
+    next: '1対1の関係も大切に。深い絆がさらに増えていく' },
+  { minScore: 26, name: '深く好かれ型', icon: '🤝', color: '#1a8060',
+    desc: '数は少なくても、深く好かれるタイプ。あなたを知る人ほど、あなたの価値を理解している。表面的な人気より、本物の信頼関係を大切にするスタイル。',
+    strength: '信頼と誠実さから生まれる深い繋がり',
+    next: '自分から少し扉を開くと、知られる人が増えていく' },
+  { minScore: 19, name: '謎の引力型', icon: '🔮', color: '#6030c0',
+    desc: 'なぜか気になる存在。言葉で説明できない引力がある。不思議と目で追ってしまう人や、「どんな人なんだろう」と気になっている人が、あなたの周りにいる。',
+    strength: '説明できない独自の存在感',
+    next: '自分から少し話しかけてみると、その魅力が開花する' },
+  { minScore: 0, name: '隠れた魅力型', icon: '🦔', color: '#607080',
+    desc: '誰にでも好かれようとしていない。それが、あなたの最大の武器かもしれない。全員に好かれることより、「この人に好かれたい」と思われることのほうが、価値がある。',
+    strength: '選んで好かれる、本物の信頼感',
+    next: '一人でいいから、本音を話してみる。そこから始まる' },
+];
+
+let answers = new Array(12).fill(null);
+let current = 0;
+let pendingXUrl = null;
+
+function startQuiz() {
+  document.getElementById('hero').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  window.scrollTo(0,0);
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  const pct = ((current + 1) / 12 * 100).toFixed(1);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `Q${current+1} / 12`;
+  document.getElementById('btnBack').disabled = current === 0;
+
+  document.getElementById('questionArea').innerHTML = `
+    <div class="question-card">
+      <div class="question-num">Q${q.id} / 12</div>
+      <div class="question-text">${q.q}</div>
+      <div class="options">
+        ${q.opts.map((o,i) => `
+          <button class="option-btn${answers[current]===i+1?' selected':''}" onclick="selectAnswer(${i+1})">${o}</button>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function selectAnswer(score) {
+  answers[current] = score;
+  document.querySelectorAll('.option-btn').forEach((b,i) => b.classList.toggle('selected', i+1===score));
+  setTimeout(() => {
+    if (current === 11) showResult();
+    else { current++; renderQuestion(); }
+  }, 280);
+}
+
+function goBack() {
+  if (current > 0) { current--; renderQuestion(); }
+}
+
+function calcResult() {
+  return answers.reduce((a,b) => a+b, 0);
+}
+
+function showResult() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('result').style.display = 'block';
+  window.scrollTo(0,0);
+
+  const total = calcResult();
+  const t = TYPES.find(t => total >= t.minScore);
+
+  document.getElementById('resultIcon').textContent = t.icon;
+  document.getElementById('resultName').textContent = t.name;
+  document.getElementById('resultName').style.color = t.color;
+  const pct = total >= 40 ? 5 : total >= 33 ? 20 : total >= 26 ? 45 : total >= 19 ? 70 : 90;
+  document.getElementById('resultScoreBadge').textContent = `スコア ${total} / 48（上位${pct}%）`;
+  document.getElementById('descText').textContent = t.desc;
+  document.getElementById('strengthText').textContent = t.strength;
+  document.getElementById('nextText').textContent = t.next;
+
+  // Sinc CTAにタイプ名を動的挿入
+  document.getElementById('sincCtaDesc').innerHTML =
+    `<strong>${t.icon} ${t.name}</strong>と話が合う人、Sincにいます。<br>同じ好かれ方をする人は、きっと居心地がいい。`;
+
+  drawShareCard(t, total);
+}
+
+function drawShareCard(t, total) {
+  const cv = document.getElementById('shareCard');
+  const ctx = cv.getContext('2d');
+  const W = 1200, H = 630;
+
+  // ライトピンクグラデーション背景
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#fff0f8');
+  bg.addColorStop(0.5, '#fde8f5');
+  bg.addColorStop(1, '#f8d6f0');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+  // ドット柄（かわいい）
+  ctx.fillStyle = 'rgba(224,58,144,0.06)';
+  for (let x = 24; x < W; x += 48) {
+    for (let y = 24; y < H; y += 48) {
+      ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // ふわっとしたセンターグロー
+  const glow = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, 380);
+  glow.addColorStop(0, 'rgba(255,150,220,0.18)');
+  glow.addColorStop(1, 'rgba(255,150,220,0)');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+
+  // 上部ピンクアクセントライン
+  const topLine = ctx.createLinearGradient(0, 0, W, 0);
+  topLine.addColorStop(0, 'rgba(224,58,144,0)');
+  topLine.addColorStop(0.3, '#e03a90');
+  topLine.addColorStop(0.7, '#ff80c0');
+  topLine.addColorStop(1, 'rgba(224,58,144,0)');
+  ctx.fillStyle = topLine; ctx.fillRect(0, 0, W, 5);
+
+  // タイトルラベル
+  ctx.font = '700 18px sans-serif'; ctx.fillStyle = 'rgba(200,60,130,0.6)';
+  ctx.textAlign = 'center'; ctx.fillText('好かれ度チェッカー', W/2, 72);
+
+  // 区切り線（薄ピンク）
+  ctx.strokeStyle = 'rgba(224,58,144,0.15)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(W/2-120, 90); ctx.lineTo(W/2+120, 90); ctx.stroke();
+
+  // タイプ名（ピンクグラデーション文字）
+  const nameGrad = ctx.createLinearGradient(W/2-200, 0, W/2+200, 0);
+  nameGrad.addColorStop(0, '#e03a90');
+  nameGrad.addColorStop(1, '#ff80c0');
+  ctx.font = '900 72px sans-serif'; ctx.fillStyle = nameGrad;
+  ctx.textAlign = 'center'; ctx.fillText(t.name, W/2, 210);
+
+  // 絵文字（大きく）
+  ctx.font = '130px serif'; ctx.textAlign = 'center';
+  ctx.fillText(t.icon, W/2, 380);
+
+  // スコアバッジ風
+  const badgeW = 200, badgeH = 44;
+  const bx = W/2 - badgeW/2, by = 410;
+  ctx.fillStyle = 'rgba(224,58,144,0.1)';
+  roundRect(ctx, bx, by, badgeW, badgeH, 22);
+  ctx.strokeStyle = 'rgba(224,58,144,0.3)'; ctx.lineWidth = 1;
+  roundRectStroke(ctx, bx, by, badgeW, badgeH, 22);
+  ctx.font = '700 20px sans-serif'; ctx.fillStyle = '#c03080';
+  ctx.fillText(`スコア ${total} / 48`, W/2, by + 28);
+
+  // タグ
+  ctx.font = '600 20px sans-serif'; ctx.fillStyle = 'rgba(224,58,144,0.5)';
+  ctx.fillText('#好かれ度チェッカー', W/2, 530);
+
+  // Sinc by StratAIX（右下・ピンク）
+  ctx.font = '700 20px sans-serif'; ctx.fillStyle = 'rgba(224,58,144,0.5)';
+  ctx.textAlign = 'right'; ctx.fillText('Sinc by StratAIX', W-52, H-56);
+
+  ctx.font = '500 15px sans-serif'; ctx.fillStyle = 'rgba(200,60,130,0.3)';
+  ctx.fillText('checker.strataix.net/moterudo/', W-52, H-34);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath(); ctx.fill();
+}
+
+function roundRectStroke(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath(); ctx.stroke();
+}
+
+function downloadCard() {
+  const cv = document.getElementById('shareCard');
+  const a = document.createElement('a');
+  a.download = 'moterudo-checker-result.png'; a.href = cv.toDataURL('image/png'); a.click();
+}
+
+async function shareToX() {
+  const cv = document.getElementById('shareCard');
+  const total = calcResult();
+  const t = TYPES.find(t => total >= t.minScore);
+  const shareText = `私の好かれ度チェッカー結果は「${t.icon} ${t.name}」でした！\nスコア: ${total}/48\n\nあなたもチェック → https://checker.strataix.net/moterudo/\n#好かれ度チェッカー #Sinc`;
+  const xUrl = 'https://x.com/intent/tweet?text=' + encodeURIComponent(shareText);
+
+  cv.toBlob(async (blob) => {
+    const file = new File([blob], 'moterudo-checker.png', { type: 'image/png' });
+
+    // モバイル: Web Share API（画像+テキスト同時共有）
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], text: shareText }); return; }
+      catch(e) { if (e.name === 'AbortError') return; }
+    }
+
+    // デスクトップ: クリップボードにコピー → モーダル表示
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      pendingXUrl = xUrl;
+      document.getElementById('shareModal').classList.add('open');
+    } catch(e) {
+      // フォールバック: 画像DL + X画面を開く
+      const a = document.createElement('a'); a.download = 'moterudo-checker.png';
+      a.href = cv.toDataURL('image/png'); a.click();
+      setTimeout(() => window.open(xUrl, '_blank'), 300);
+    }
+  }, 'image/png');
+}
+
+function closeShareModal() {
+  document.getElementById('shareModal').classList.remove('open');
+  if (pendingXUrl) {
+    window.open(pendingXUrl, '_blank');
+    pendingXUrl = null;
+  }
+}
+
+function retryQuiz() {
+  answers = new Array(12).fill(null); current = 0;
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('hero').style.display = '';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

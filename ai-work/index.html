@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIワーク相性チェッカー — あなたは16タイプのどれ？</title>
+<meta name="description" content="習熟度×興味度の組み合わせで、あなたのAIワーカータイプが分かる。無料・登録不要・16問。">
+<meta property="og:title" content="AIワーク相性チェッカー">
+<meta property="og:description" content="16タイプで分かる、あなたのAIワーク相性。無料・登録不要。">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cyan:   #4DE8E0;
+  --cyan2:  #2abfb8;
+  --purple: #9060ff;
+  --orange: #ff7030;
+  --bg:     #07070e;
+  --bg2:    #0d0d1e;
+  --bg3:    #12121f;
+  --white:  #ffffff;
+  --gray1:  #b0b8c8;
+  --gray2:  #606880;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── グリッド背景 ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(77,232,224,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77,232,224,.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+section { position: relative; z-index: 1; }
+
+/* ══════════════════════════════
+   HERO
+══════════════════════════════ */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px 80px;
+  text-align: center;
+}
+
+.hero-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(77,232,224,.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border: 1px solid rgba(77,232,224,.35);
+  border-radius: 20px;
+  background: rgba(77,232,224,.06);
+  color: var(--cyan);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  margin-bottom: 32px;
+}
+.hero-badge::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: .3; }
+}
+
+.hero-title {
+  font-size: clamp(32px, 6vw, 64px);
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+  margin-bottom: 12px;
+}
+.hero-title .accent {
+  background: linear-gradient(90deg, var(--cyan) 0%, #a0f0ec 60%, #fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: clamp(16px, 2.5vw, 22px);
+  color: var(--gray1);
+  font-weight: 400;
+  margin-bottom: 48px;
+  line-height: 1.6;
+}
+
+.hero-types {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 52px;
+  max-width: 600px;
+}
+.type-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,.1);
+  font-size: 13px;
+  color: var(--gray1);
+  white-space: nowrap;
+}
+
+.btn-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 52px;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan2) 100%);
+  color: #07070e;
+  font-size: 18px;
+  font-weight: 900;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  letter-spacing: .04em;
+  box-shadow: 0 0 32px rgba(77,232,224,.3);
+  transition: transform .2s, box-shadow .2s;
+}
+.btn-start:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 40px rgba(77,232,224,.45);
+}
+.btn-start::after { content: '→'; font-size: 20px; }
+
+.hero-meta {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--gray2);
+}
+.hero-meta span { margin: 0 10px; }
+
+/* ══════════════════════════════
+   QUIZ
+══════════════════════════════ */
+#quiz {
+  display: none;
+  min-height: 100vh;
+  padding: 40px 24px 80px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.progress-wrap {
+  margin-bottom: 36px;
+}
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--gray2);
+  margin-bottom: 8px;
+}
+.progress-label .axis-label {
+  color: var(--cyan);
+  font-weight: 700;
+}
+.progress-bar-bg {
+  height: 4px;
+  background: rgba(255,255,255,.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  border-radius: 2px;
+  transition: width .4s ease;
+}
+
+.question-card {
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  padding: 36px 32px;
+  margin-bottom: 24px;
+  animation: fadeUp .35s ease;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.question-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: .1em;
+  margin-bottom: 14px;
+}
+.question-text {
+  font-size: clamp(17px, 2.5vw, 21px);
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--white);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 28px;
+}
+.option-btn {
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  color: var(--white);
+  font-size: 15px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .1s;
+  line-height: 1.5;
+}
+.option-btn:hover {
+  background: rgba(77,232,224,.08);
+  border-color: rgba(77,232,224,.4);
+  transform: translateX(4px);
+}
+.option-btn.selected {
+  background: rgba(77,232,224,.12);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.quiz-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+.btn-back {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 8px;
+  color: var(--gray2);
+  font-size: 14px;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.btn-back:hover { border-color: var(--gray1); color: var(--gray1); }
+.btn-back:disabled { opacity: .3; cursor: default; }
+
+.axis-divider {
+  text-align: center;
+  padding: 40px 0;
+  animation: fadeUp .35s ease;
+}
+.axis-divider-label {
+  display: inline-block;
+  padding: 10px 28px;
+  border: 1px solid rgba(144,96,255,.4);
+  border-radius: 24px;
+  background: rgba(144,96,255,.08);
+  color: var(--purple);
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.axis-divider p {
+  font-size: 13px;
+  color: var(--gray2);
+  margin-top: 8px;
+}
+
+/* ══════════════════════════════
+   RESULT
+══════════════════════════════ */
+#result {
+  display: none;
+  padding: 60px 24px 100px;
+  max-width: 680px;
+  margin: 0 auto;
+  animation: fadeUp .5s ease;
+}
+
+.result-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.result-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--cyan);
+  margin-bottom: 16px;
+}
+.result-icon {
+  font-size: 72px;
+  line-height: 1;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 20px rgba(77,232,224,.3));
+}
+.result-name {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+.result-axes {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.axis-badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid;
+}
+.axis-badge.p { background: rgba(77,232,224,.1); border-color: rgba(77,232,224,.3); color: var(--cyan); }
+.axis-badge.i { background: rgba(144,96,255,.1); border-color: rgba(144,96,255,.3); color: var(--purple); }
+
+.result-card {
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 20px;
+}
+.result-card h3 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--gray2);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.result-card p {
+  font-size: 16px;
+  color: var(--gray1);
+  line-height: 1.8;
+}
+.result-strength {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: rgba(77,232,224,.08);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--cyan);
+  font-weight: 700;
+}
+.result-strength::before { content: '⚡'; }
+
+.result-next {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(144,96,255,.06);
+  border: 1px solid rgba(144,96,255,.2);
+  border-radius: 12px;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--gray1);
+  line-height: 1.6;
+}
+.result-next::before { content: '→'; color: var(--purple); font-weight: 900; flex-shrink: 0; margin-top: 1px; }
+
+/* スコアメーター */
+.score-meters {
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+}
+.score-meters h3 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--gray2);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+.meter-row {
+  margin-bottom: 16px;
+}
+.meter-row:last-child { margin-bottom: 0; }
+.meter-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--gray1);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.meter-label span { font-weight: 700; }
+.meter-bg {
+  height: 8px;
+  background: rgba(255,255,255,.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.meter-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s ease .3s;
+}
+.meter-fill.p { background: linear-gradient(90deg, var(--cyan2), var(--cyan)); }
+.meter-fill.i { background: linear-gradient(90deg, #6030c0, var(--purple)); }
+.meter-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+.meter-tick {
+  font-size: 10px;
+  color: var(--gray2);
+}
+
+/* シェアエリア */
+.share-area {
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.share-area h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray1);
+  margin-bottom: 20px;
+}
+
+canvas#shareCard {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 12px;
+  display: block;
+  margin: 0 auto 20px;
+  box-shadow: 0 4px 32px rgba(0,0,0,.4);
+}
+
+.share-btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn-x {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #000;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 50px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s;
+}
+.btn-x:hover { background: #111; }
+.btn-dl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: rgba(77,232,224,.1);
+  border: 1px solid rgba(77,232,224,.3);
+  border-radius: 50px;
+  color: var(--cyan);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-dl:hover { background: rgba(77,232,224,.2); }
+
+/* Sinc CTA */
+.sinc-cta {
+  background: linear-gradient(135deg, rgba(77,232,224,.06) 0%, rgba(144,96,255,.08) 100%);
+  border: 1px solid rgba(77,232,224,.25);
+  border-radius: 24px;
+  padding: 36px 32px;
+  text-align: center;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.sinc-cta::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(144,96,255,.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.sinc-logo-wrap {
+  margin-bottom: 12px;
+}
+.sinc-logo-text {
+  font-size: 28px;
+  font-weight: 900;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -.02em;
+}
+.sinc-tagline {
+  font-size: 13px;
+  color: var(--cyan);
+  font-weight: 700;
+  letter-spacing: .06em;
+  margin-bottom: 16px;
+}
+.sinc-desc {
+  font-size: 15px;
+  color: var(--gray1);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.sinc-desc strong { color: var(--white); font-weight: 700; }
+.btn-sinc {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 40px;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan2) 100%);
+  color: #07070e;
+  font-size: 16px;
+  font-weight: 900;
+  font-family: 'Noto Sans JP', sans-serif;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 0 24px rgba(77,232,224,.25);
+  transition: transform .2s, box-shadow .2s;
+}
+.btn-sinc:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 32px rgba(77,232,224,.4);
+}
+.btn-sinc::after { content: '→'; }
+
+/* StratAIX footer */
+.strataix-footer {
+  text-align: center;
+  padding-top: 8px;
+}
+.strataix-footer a {
+  font-size: 12px;
+  color: var(--gray2);
+  text-decoration: none;
+  transition: color .15s;
+}
+.strataix-footer a:hover { color: var(--gray1); }
+
+/* retry */
+.btn-retry {
+  display: block;
+  margin: 20px auto 0;
+  padding: 12px 32px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 50px;
+  color: var(--gray2);
+  font-size: 14px;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.btn-retry:hover { border-color: var(--gray1); color: var(--gray1); }
+
+@media (max-width: 480px) {
+  .question-card { padding: 24px 20px; }
+  .result-card, .score-meters, .share-area, .sinc-cta { padding: 24px 20px; }
+  .hero-types { display: none; }
+}
+
+/* アクセシビリティ */
+.btn-start:focus-visible,
+.option-btn:focus-visible,
+.btn-back:focus-visible,
+.btn-x:focus-visible,
+.btn-dl:focus-visible,
+.btn-sinc:focus-visible,
+.btn-retry:focus-visible,
+.share-modal-btn:focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 3px;
+}
+button { touch-action: manipulation; }
+.hero-title { text-wrap: balance; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* DESKTOP SHARE MODAL */
+#shareModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(7,7,14,.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+#shareModal.open { display: flex; }
+.share-modal-box {
+  background: #0f1020;
+  border: 1px solid rgba(77,232,224,.3);
+  border-radius: 24px;
+  padding: 36px 32px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 12px 56px rgba(77,232,224,.15);
+  animation: fadeUp .25s ease;
+}
+.share-modal-icon { font-size: 48px; margin-bottom: 14px; }
+.share-modal-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 10px; }
+.share-modal-desc { font-size: 14px; color: var(--gray1); line-height: 1.8; margin-bottom: 8px; }
+.share-modal-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(77,232,224,.07);
+  border: 1px solid rgba(77,232,224,.25);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cyan);
+  margin-bottom: 20px;
+}
+.share-modal-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan2, #00c8c0) 100%);
+  color: #07070e;
+  border: none;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 900;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.share-modal-btn:hover { transform: translateY(-2px); }
+</style>
+</head>
+<body>
+
+<!-- Desktop share modal -->
+<div id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+  <div class="share-modal-box">
+    <div class="share-modal-icon">📋</div>
+    <div class="share-modal-title" id="shareModalTitle">画像をコピーしました！</div>
+    <div class="share-modal-desc">このままXの投稿画面が開きます。</div>
+    <div class="share-modal-hint">📌 画像をペーストするだけで完成！</div>
+    <button class="share-modal-btn" onclick="closeShareModal()">OK、Xを開く →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     HERO
+══════════════════════════════ -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge">AI WORK CHECKER</div>
+  <h1 class="hero-title">
+    あなた、AIに<span class="accent">使われてる？</span><br>
+    それとも使いこなしてる？
+  </h1>
+  <p class="hero-sub">
+    16問でわかる、あなたのAIワークタイプ。<br>
+    習熟度 × 興味度で16タイプに分類。
+  </p>
+  <div class="hero-types">
+    <span class="type-chip">🚀 AIネイティブ型</span>
+    <span class="type-chip">⚡ 変革の実践者型</span>
+    <span class="type-chip">🔥 止まれない加速型</span>
+    <span class="type-chip">🎯 現場の実践者型</span>
+    <span class="type-chip">⚖️ 知的バランサー型</span>
+    <span class="type-chip">🦁 孤高の達人型</span>
+    <span class="type-chip">🌊 波に乗りたい型</span>
+    <span class="type-chip">🌈 夢見るAI信者型</span>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">診断スタート</button>
+  <p class="hero-meta">
+    <span>無料</span>
+    <span>登録不要</span>
+    <span>16問・約3分</span>
+  </p>
+</section>
+
+<!-- ══════════════════════════════
+     QUIZ
+══════════════════════════════ -->
+<section id="quiz">
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span id="progressText">Q1 / 16</span>
+      <span class="axis-label" id="axisLabel">習熟度を測定中</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar" style="width:6.25%"></div>
+    </div>
+  </div>
+  <div id="questionArea"></div>
+  <div class="quiz-nav">
+    <button class="btn-back" id="btnBack" onclick="goBack()" disabled>← 戻る</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     RESULT
+══════════════════════════════ -->
+<section id="result">
+  <div class="result-header">
+    <div class="result-label">YOUR TYPE</div>
+    <div class="result-icon" id="resultIcon"></div>
+    <div class="result-name" id="resultName"></div>
+    <div class="result-axes" id="resultAxes"></div>
+  </div>
+
+  <div class="score-meters">
+    <h3>スコア詳細</h3>
+    <div class="meter-row">
+      <div class="meter-label">
+        <span>AI習熟度</span>
+        <span id="pScoreLabel"></span>
+      </div>
+      <div class="meter-bg"><div class="meter-fill p" id="pMeter" style="width:0"></div></div>
+      <div class="meter-ticks">
+        <span class="meter-tick">初心者</span>
+        <span class="meter-tick">入門</span>
+        <span class="meter-tick">中級</span>
+        <span class="meter-tick">上級</span>
+      </div>
+    </div>
+    <div class="meter-row">
+      <div class="meter-label">
+        <span>AI興味度</span>
+        <span id="iScoreLabel"></span>
+      </div>
+      <div class="meter-bg"><div class="meter-fill i" id="iMeter" style="width:0"></div></div>
+      <div class="meter-ticks">
+        <span class="meter-tick">懐疑派</span>
+        <span class="meter-tick">様子見派</span>
+        <span class="meter-tick">前向き派</span>
+        <span class="meter-tick">熱狂派</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-card" id="resultDesc">
+    <h3>タイプ解説</h3>
+    <p id="descText"></p>
+    <div class="result-strength" id="strengthText"></div>
+    <div class="result-next" id="nextText"></div>
+  </div>
+
+  <div class="share-area">
+    <h3>結果をシェアする</h3>
+    <canvas id="shareCard" width="1200" height="630"></canvas>
+    <div class="share-btns">
+      <button class="btn-dl" onclick="downloadCard()">⬇ 画像を保存</button>
+      <button class="btn-x" onclick="shareToX()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        Xでシェア
+      </button>
+    </div>
+  </div>
+
+  <div class="sinc-cta">
+    <div class="sinc-logo-wrap">
+      <div class="sinc-logo-text">Sinc</div>
+    </div>
+    <div class="sinc-tagline">性格診断 × マッチング</div>
+    <p class="sinc-desc" id="sincCtaDesc">
+      あなたと<strong>同じタイプの人</strong>、Sincにいます。<br>
+      相性診断で繋がる、新しいコミュニティ。<br>
+      登録して、本当に合う人と話してみませんか？
+    </p>
+    <a href="https://sinc.strataix.net" target="_blank" rel="noopener" class="btn-sinc">
+      Sincを試してみる
+    </a>
+  </div>
+
+  <button class="btn-retry" onclick="retryQuiz()">もう一度診断する</button>
+
+  <div class="strataix-footer">
+    <a href="https://strataix.net" target="_blank" rel="noopener">Made by StratAIX</a>
+  </div>
+</section>
+
+<script>
+// ══════════════════════════════
+//   DATA
+// ══════════════════════════════
+const QUESTIONS = [
+  // 習熟度軸 Q1-Q8
+  { id:1, axis:'p', q:'日常的に使っているAIツールはいくつありますか？',
+    opts:['ほとんど使っていない（0〜1個）','主にChatGPTなど1〜2個を使っている','GPT・Claude・Geminiなど3〜5個を日常的に使う','6個以上、またはAPIや自動化ツールまで活用'] },
+  { id:2, axis:'p', q:'AIツールを使い始めたきっかけは？',
+    opts:['まだほとんど使っていない','ChatGPTが話題になって試してみた（2022〜2023年頃）','仕事に活かそうと本格的に使い始めた','GPT-3やMidjourneyの頃から注目していた（早期組）'] },
+  { id:3, axis:'p', q:'AIが出した答えに対して、あなたは？',
+    opts:['内容をあまり確認せず使うことが多い','重要な部分だけ確認してから使う','必ず確認・修正してから使う','プロンプトを工夫して精度を上げてから使う'] },
+  { id:4, axis:'p', q:'「プロンプトエンジニアリング」という言葉を知っている？',
+    opts:['知らない','聞いたことはある','知っていて自分でも実践している','体系的に学んで日常的に改善・活用している'] },
+  { id:5, axis:'p', q:'AIツールを仕事にどう組み込んでいる？',
+    opts:['特に使っていない','文章チェックなど特定の作業だけ使う','多くの作業で日常的に活用している','ワークフロー全体にAIを組み込んでいる'] },
+  { id:6, axis:'p', q:'AIの限界・弱点（ハルシネーションなど）をどう扱っている？',
+    opts:['よく知らない','知っているが特に対策はしていない','知っていて使い方を意識的に調整している','詳しく理解して具体的な対策を実践している'] },
+  { id:7, axis:'p', q:'新しいAIツールが出たとき、どうやって学ぶ？',
+    opts:['あまり新しいものは試さない','基本的な使い方を触って確認する','応用例を探して実践してみる','仕組みも含めて理解しながら深く学ぶ'] },
+  { id:8, axis:'p', q:'AIを使って仕事で「これは本当に助かった」と感じた経験は？',
+    opts:['ほとんどない','1〜2回ある','何度もある','日常的に感じている'] },
+
+  // 興味軸 Q9-Q16
+  { id:9, axis:'i', q:'AIの話題が出たとき、あなたの気持ちは？',
+    opts:['少し不安・距離を置きたいと感じる','気になるけど積極的ではない','前向きに聞きたい・参加したい','ワクワクする・もっと話したい'] },
+  { id:10, axis:'i', q:'AI技術の進化について、どう感じる？',
+    opts:['変化が速すぎて正直疲れる','気になるが追いかける余裕がない','できる範囲でキャッチアップしたい','毎日チェックしているくらい楽しい'] },
+  { id:11, axis:'i', q:'「今の仕事の○%はAIに置き換わる」という話を聞いて？',
+    opts:['仕事を守ることを真剣に考える','影響はあるだろうが、まだ先の話','変化に乗り遅れないよう準備したい','むしろ面白い時代が来ると思う'] },
+  { id:12, axis:'i', q:'AIを使った新しいサービスや実験を見たとき？',
+    opts:['慎重に評価したい・リスクも気になる','気になるけど自分では試さない','機会があればぜひ試したい','すぐに試してみたくなる'] },
+  { id:13, axis:'i', q:'自分の仕事にAIをもっと取り入れることについて？',
+    opts:['今は必要性をあまり感じていない','そのうちやってみようとは思っている','積極的に取り入れていきたい','もっと深く使い込みたい・既に計画がある'] },
+  { id:14, axis:'i', q:'AIについて人と話すとき、どちら側が多い？',
+    opts:['あまり語りたくない','主に聞く側になることが多い','自分の経験を積極的に共有する','ついつい熱く語ってしまう'] },
+  { id:15, axis:'i', q:'「AIを使うのは楽をしているだけ」という意見を聞いて？',
+    opts:['一理あると思う','場合によるとは思う','それは違うと感じる','明らかに間違っている・AIは新しいスキルだ'] },
+  { id:16, axis:'i', q:'2年後の自分とAIの関係、どうイメージする？',
+    opts:['今とあまり変わらないかな','少しは使っているかな','もっとうまく使えるようになっていたい','AIを軸に仕事のやり方を変えていたい'] },
+];
+
+const TYPES = {
+  'L4I4': { name:'AIネイティブ型', icon:'🚀', pl:'上級', il:'熱狂派',
+    color:'#4DE8E0',
+    desc:'AIが空気のように存在している世界で生きている人。早い段階から試し、失敗を重ね、今では仕事の中核にAIを組み込んでいる。周囲への影響力も大きく、時代の先頭を走っている。',
+    strength:'圧倒的な実践経験と判断力',
+    next:'コミュニティを作る・次世代を育てる側へ' },
+  'L4I3': { name:'変革の実践者型', icon:'⚡', pl:'上級', il:'前向き派',
+    color:'#a0f0ec',
+    desc:'高い技術力と前向きな姿勢の最強コンビ。AIを深く使いこなしながら、もっと良い使い方を常に模索している。組織やチームへの影響力も自然と生まれている。',
+    strength:'技術力と行動力の両立',
+    next:'アウトプットを増やして影響範囲を広げる' },
+  'L4I2': { name:'時代を俯瞰する人型', icon:'🌐', pl:'上級', il:'様子見派',
+    color:'#60c0ff',
+    desc:'深い経験がありながら、冷静に全体を見渡せる貴重な存在。AIの可能性も限界も熟知しているから、流行に踊らされない判断力がある。その知見は周囲から一目置かれている。',
+    strength:'客観的な判断力と深い理解',
+    next:'その知見を言語化・発信すると価値になる' },
+  'L4I1': { name:'孤高の達人型', icon:'🦁', pl:'上級', il:'懐疑派',
+    color:'#d4a0ff',
+    desc:'誰よりもAIを使いこなしながら、その限界も誰よりも知っている。懐疑的なのは無知からではなく、深い理解から来ている。その批判的視点は組織にとって大きな価値がある。',
+    strength:'冷静な批判的思考と高い技術力',
+    next:'自分の知識を、周囲への警鐘として活かす' },
+
+  'L3I4': { name:'止まれない加速型', icon:'🔥', pl:'中級', il:'熱狂派',
+    color:'#ff9060',
+    desc:'知識も熱量も高く、今まさに急成長中。次のレベルへの壁を越えれば、一気に上級の仲間入りができる。行動力と好奇心が最大の武器で、周囲も巻き込んでいる。',
+    strength:'学習速度と爆発的な実行力',
+    next:'量より質へ、一つのツールを深く極める' },
+  'L3I3': { name:'現場の実践者型', icon:'🎯', pl:'中級', il:'前向き派',
+    color:'#60d4a0',
+    desc:'着実にAIを使いながら、さらに上を目指している。理想と現実のバランスが取れていて、職場での信頼も自然と生まれている。地に足のついた実力者タイプ。',
+    strength:'バランスの取れた判断力と実績',
+    next:'得意なAI活用パターンを1つ決めて深める' },
+  'L3I2': { name:'知的バランサー型', icon:'⚖️', pl:'中級', il:'様子見派',
+    color:'#a0c0e0',
+    desc:'使える技術を持ちながら、慎重に判断する賢さがある。AIに振り回されず、自分のペースで活用できている。もう少し前に踏み込む余地がある。',
+    strength:'堅実な判断力と技術的な底力',
+    next:'「使う場面」をもう1つ増やすだけで体感が変わる' },
+  'L3I1': { name:'腕利き職人型', icon:'🧰', pl:'中級', il:'懐疑派',
+    color:'#c0b090',
+    desc:'高い技術力を持ちながら、AIより自分のスキルを信頼するタイプ。それは誇れる強みだが、AIを道具として加えることで仕事の幅がさらに広がるかもしれない。',
+    strength:'確かな技術力と高い品質基準',
+    next:'繰り返し作業の一部だけAIに任せてみる' },
+
+  'L2I4': { name:'波に乗りたい型', icon:'🌊', pl:'入門', il:'熱狂派',
+    color:'#4080ff',
+    desc:'AIへの興味と熱量は満点。あとは経験を積んで慣れるだけ。その前向きさがあれば、成長スピードは早いはず。今がいちばん伸びるタイミングかもしれない。',
+    strength:'高い学習意欲と圧倒的な積極性',
+    next:'毎日1回、何でもいいのでAIに聞いてみるクセをつける' },
+  'L2I3': { name:'着実に走り出し型', icon:'🚲', pl:'入門', il:'前向き派',
+    color:'#80d060',
+    desc:'使い始めて、少しずつ手応えを感じている段階。焦らず続けることで、半年後には大きく変わっているはず。継続力が最大の武器。',
+    strength:'継続力と現実的なアプローチ',
+    next:'「これだけはAIで」という作業を1つ決めて習慣にする' },
+  'L2I2': { name:'じっくり観察型', icon:'🔍', pl:'入門', il:'様子見派',
+    color:'#b0b8d8',
+    desc:'慎重に、でも確実に前に進んでいる。情報収集力が高く、いざ動き出したときの精度が高い。観察した知識が、行動に変わるときが楽しみなタイプ。',
+    strength:'丁寧な情報収集と慎重な判断力',
+    next:'観察した内容を、一度だけ実際に試してみる' },
+  'L2I1': { name:'堅実な一歩一歩型', icon:'🦔', pl:'入門', il:'懐疑派',
+    color:'#a0a090',
+    desc:'急がず・焦らず、自分のペースを大切にするタイプ。新しいものへの慎重さは、大切な資質だ。無理に急ぐ必要はないが、道具として知っておくだけでも損はない。',
+    strength:'堅実さと自分らしいペース',
+    next:'「AIに聞いてみる」を1日1回だけ試す' },
+
+  'L1I4': { name:'夢見るAI信者型', icon:'🌈', pl:'初心者', il:'熱狂派',
+    color:'#ff80c0',
+    desc:'AIへの期待と夢は誰にも負けない。経験はこれから積めばいい。その熱量があれば、始めさえすれば一気に伸びるタイプ。今すぐ最初の一歩を踏み出そう。',
+    strength:'爆発的な学習意欲と無限の可能性',
+    next:'今すぐChatGPTを開いて、最初の質問をする' },
+  'L1I3': { name:'今すぐ始めたい型', icon:'🐣', pl:'初心者', il:'前向き派',
+    color:'#f0d060',
+    desc:'気持ちは前向き、あとは最初の一歩だけ。ChatGPTを今日から使ってみると、世界が変わるかもしれない。始めることへの準備は十分できている。',
+    strength:'素直な向上心と行動への準備',
+    next:'今日の業務の悩みを、そのままAIに聞いてみる' },
+  'L1I2': { name:'静かな芽吹き型', icon:'🌱', pl:'初心者', il:'様子見派',
+    color:'#80c880',
+    desc:'ゆっくりだけど、確実に芽吹こうとしている。自分のタイミングで始めれば、それでいい。焦る必要はない。いつか「あの頃始めてよかった」と思える日が来る。',
+    strength:'自分のペースを知っていること',
+    next:'AIがどんなことに使われているか、記事を1本読んでみる' },
+  'L1I1': { name:'マイペース守護者型', icon:'🛡️', pl:'初心者', il:'懐疑派',
+    color:'#909090',
+    desc:'AIより大切なことがある、と感じているあなた。その価値観は尊重されるべきだ。ただ、道具として少し知っておくだけでも、将来の選択肢が増えるかもしれない。',
+    strength:'自分の価値観をしっかり持っていること',
+    next:'プレッシャーなく、AIのニュースを1つ読んでみる' },
+};
+
+// ══════════════════════════════
+//   STATE
+// ══════════════════════════════
+let answers = new Array(16).fill(null);
+let current = 0;
+let showingDivider = false;
+
+// ══════════════════════════════
+//   QUIZ FLOW
+// ══════════════════════════════
+function startQuiz() {
+  document.getElementById('hero').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  window.scrollTo(0,0);
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const area = document.getElementById('questionArea');
+  const idx = current;
+  const q = QUESTIONS[idx];
+
+  // 軸切り替え演出（Q8→Q9の間）
+  if (showingDivider) {
+    area.innerHTML = `
+      <div class="axis-divider">
+        <div class="axis-divider-label">🧠 次は「興味度」を測定します</div>
+        <p>AIに対するあなたの気持ちや姿勢を教えてください</p>
+      </div>`;
+    document.getElementById('progressText').textContent = 'Q9 / 16';
+    document.getElementById('axisLabel').textContent = '興味度を測定中';
+    document.getElementById('progressBar').style.width = '50%';
+    document.getElementById('btnBack').disabled = false;
+    setTimeout(() => { showingDivider = false; renderQuestion(); }, 1800);
+    return;
+  }
+
+  updateProgress(idx);
+
+  area.innerHTML = `
+    <div class="question-card">
+      <div class="question-num">Q${q.id} / 16 — ${q.axis === 'p' ? 'AI習熟度' : 'AI興味度'}</div>
+      <div class="question-text">${q.q}</div>
+      <div class="options">
+        ${q.opts.map((o,i) => `
+          <button class="option-btn${answers[idx] === i+1 ? ' selected' : ''}"
+            onclick="selectAnswer(${i+1})">${o}</button>
+        `).join('')}
+      </div>
+    </div>`;
+
+  document.getElementById('btnBack').disabled = (current === 0);
+}
+
+function selectAnswer(score) {
+  answers[current] = score;
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((b,i) => b.classList.toggle('selected', i+1 === score));
+
+  setTimeout(() => {
+    if (current === 7) {
+      // 習熟度→興味度の区切り
+      current = 8;
+      showingDivider = true;
+      renderQuestion();
+    } else if (current === 15) {
+      showResult();
+    } else {
+      current++;
+      renderQuestion();
+    }
+  }, 280);
+}
+
+function goBack() {
+  if (current === 8 && !showingDivider) {
+    current = 7;
+  } else if (current > 0) {
+    current--;
+  }
+  renderQuestion();
+}
+
+function updateProgress(idx) {
+  const pct = ((idx + 1) / 16 * 100).toFixed(1);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `Q${idx+1} / 16`;
+  document.getElementById('axisLabel').textContent = idx < 8 ? '習熟度を測定中' : '興味度を測定中';
+}
+
+// ══════════════════════════════
+//   SCORING
+// ══════════════════════════════
+function calcResult() {
+  const pScores = answers.slice(0,8);
+  const iScores = answers.slice(8,16);
+  const pAvg = pScores.reduce((a,b) => a+b, 0) / 8;
+  const iAvg = iScores.reduce((a,b) => a+b, 0) / 8;
+
+  const pLevel = pAvg >= 3.25 ? 'L4' : pAvg >= 2.5 ? 'L3' : pAvg >= 1.75 ? 'L2' : 'L1';
+  const iLevel = iAvg >= 3.25 ? 'I4' : iAvg >= 2.5 ? 'I3' : iAvg >= 1.75 ? 'I2' : 'I1';
+
+  return { key: pLevel+iLevel, pAvg, iAvg, pLevel, iLevel };
+}
+
+// ══════════════════════════════
+//   RESULT
+// ══════════════════════════════
+function showResult() {
+  document.getElementById('quiz').style.display = 'none';
+  const res = document.getElementById('result');
+  res.style.display = 'block';
+  window.scrollTo(0,0);
+
+  const { key, pAvg, iAvg, pLevel, iLevel } = calcResult();
+  const t = TYPES[key];
+
+  document.getElementById('resultIcon').textContent = t.icon;
+  document.getElementById('resultName').textContent = t.name;
+  document.getElementById('resultName').style.color = t.color;
+
+  const pLabel = { L1:'初心者', L2:'入門', L3:'中級', L4:'上級' }[pLevel];
+  const iLabel = { I1:'懐疑派', I2:'様子見派', I3:'前向き派', I4:'熱狂派' }[iLevel];
+  document.getElementById('resultAxes').innerHTML = `
+    <span class="axis-badge p">習熟度: ${pLabel}</span>
+    <span class="axis-badge i">興味度: ${iLabel}</span>`;
+
+  // メーター
+  const pPct = ((pAvg - 1) / 3 * 100).toFixed(0);
+  const iPct = ((iAvg - 1) / 3 * 100).toFixed(0);
+  setTimeout(() => {
+    document.getElementById('pMeter').style.width = Math.max(4, pPct) + '%';
+    document.getElementById('iMeter').style.width = Math.max(4, iPct) + '%';
+  }, 100);
+  document.getElementById('pScoreLabel').textContent = pLabel;
+  document.getElementById('iScoreLabel').textContent = iLabel;
+
+  // 解説
+  document.getElementById('descText').textContent = t.desc;
+  document.getElementById('strengthText').textContent = t.strength;
+  document.getElementById('nextText').textContent = t.next;
+
+  // Sinc CTAにタイプ名を動的挿入
+  document.getElementById('sincCtaDesc').innerHTML =
+    `<strong>${t.icon} ${t.name}</strong>と話が合う人、Sincにいます。<br>同じAIワークスタイルを持つ人と話すと、きっと刺激になる。`;
+
+  // シェアカード
+  drawShareCard(t, pLabel, iLabel);
+}
+
+// ══════════════════════════════
+//   SHARE CARD (Canvas)
+// ══════════════════════════════
+function drawShareCard(t, pLabel, iLabel) {
+  const cv = document.getElementById('shareCard');
+  const ctx = cv.getContext('2d');
+  const W = 1200, H = 630;
+
+  // 背景
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0, '#07070e');
+  bg.addColorStop(1, '#0d0d1e');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  // グリッド
+  ctx.strokeStyle = 'rgba(77,232,224,0.05)';
+  ctx.lineWidth = 1;
+  for (let x=0; x<W; x+=48) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y=0; y<H; y+=48) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  // グロー
+  const glow = ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,400);
+  glow.addColorStop(0, 'rgba(77,232,224,0.1)');
+  glow.addColorStop(1, 'rgba(77,232,224,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0,0,W,H);
+
+  // 左アクセントライン
+  ctx.fillStyle = '#4DE8E0';
+  ctx.fillRect(48, 60, 4, H-120);
+
+  // ブランド
+  ctx.font = '700 20px sans-serif';
+  ctx.fillStyle = '#2abfb8';
+  ctx.textAlign = 'left';
+  ctx.fillText('AI WORK CHECKER — StratAIX', 72, 96);
+
+  // アイコン
+  ctx.font = '120px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(t.icon, W/2, 280);
+
+  // タイプ名
+  ctx.font = '900 72px sans-serif';
+  ctx.fillStyle = t.color;
+  ctx.fillText(t.name, W/2, 370);
+
+  // 軸バッジ
+  const badgeText = `習熟度: ${pLabel}　／　興味度: ${iLabel}`;
+  ctx.font = '500 28px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText(badgeText, W/2, 430);
+
+  // タグ
+  ctx.font = '600 22px sans-serif';
+  ctx.fillStyle = 'rgba(77,232,224,0.6)';
+  ctx.fillText('#AIワーク相性チェッカー', W/2, 530);
+
+  // Sinc by StratAIX（右下・さりげなく）
+  ctx.font = '700 22px sans-serif';
+  ctx.fillStyle = 'rgba(77,232,224,0.55)';
+  ctx.textAlign = 'right';
+  ctx.fillText('Sinc by StratAIX', W-52, H-64);
+
+  // URL
+  ctx.font = '500 17px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.fillText('checker.strataix.net/ai-work/', W-52, H-38);
+}
+
+function downloadCard() {
+  const cv = document.getElementById('shareCard');
+  const a = document.createElement('a');
+  a.download = 'ai-work-checker-result.png';
+  a.href = cv.toDataURL('image/png');
+  a.click();
+}
+
+async function shareToX() {
+  const cv = document.getElementById('shareCard');
+  const { key, pLevel, iLevel } = calcResult();
+  const t = TYPES[key];
+  const pLabel = { L1:'初心者', L2:'入門', L3:'中級', L4:'上級' }[pLevel];
+  const iLabel = { I1:'懐疑派', I2:'様子見派', I3:'前向き派', I4:'熱狂派' }[iLevel];
+
+  const shareText = `私のAIワーク相性は「${t.icon} ${t.name}」でした！\n習熟度: ${pLabel} / 興味度: ${iLabel}\n\nあなたのタイプは？\nhttps://checker.strataix.net/ai-work/\n#AIワーク相性チェッカー #Sinc`;
+  const xIntentUrl = 'https://x.com/intent/tweet?text=' + encodeURIComponent(shareText);
+
+  cv.toBlob(async (blob) => {
+    const file = new File([blob], 'ai-work-checker.png', { type: 'image/png' });
+
+    // モバイル: Web Share API（画像付きでXに直接シェア）
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], text: shareText });
+        return;
+      } catch(e) {
+        if (e.name === 'AbortError') return; // ユーザーキャンセル
+      }
+    }
+
+    // デスクトップ: クリップボードに画像コピー → モーダル表示
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      pendingXUrl = xIntentUrl;
+      document.getElementById('shareModal').classList.add('open');
+    } catch(e) {
+      // クリップボード不可 → 画像を自動DL + X を開く
+      const a = document.createElement('a');
+      a.download = 'ai-work-checker.png';
+      a.href = cv.toDataURL('image/png');
+      a.click();
+      setTimeout(() => window.open(xIntentUrl, '_blank'), 300);
+    }
+  }, 'image/png');
+}
+
+let pendingXUrl = null;
+function closeShareModal() {
+  document.getElementById('shareModal').classList.remove('open');
+  if (pendingXUrl) { window.open(pendingXUrl, '_blank'); pendingXUrl = null; }
+}
+
+function retryQuiz() {
+  answers = new Array(16).fill(null);
+  current = 0;
+  showingDivider = false;
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('hero').style.display = '';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

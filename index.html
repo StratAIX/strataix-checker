@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StratAIX チェッカーシリーズ — 無料・登録不要の診断ツール集</title>
+<meta name="description" content="自分を知る、無料の診断ツール集。AIワーク相性・好かれ度・職場適性など、毎週新しいチェッカーが追加されます。">
+<meta property="og:title" content="StratAIX チェッカーシリーズ">
+<meta property="og:description" content="無料・登録不要の診断ツール集。自分を知る、シェアして楽しむ。">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cyan:   #4DE8E0;
+  --cyan2:  #2abfb8;
+  --purple: #9060ff;
+  --pink:   #ff6eb4;
+  --green:  #3dd4aa;
+  --orange: #ff9040;
+  --bg:     #07070e;
+  --bg2:    #0d0d1e;
+  --bg3:    #12121f;
+  --white:  #ffffff;
+  --gray1:  #b0b8c8;
+  --gray2:  #606880;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(77,232,224,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77,232,224,.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+/* HERO */
+.hero {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 100px 24px 80px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.hero-glow {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 700px; height: 500px;
+  background: radial-gradient(ellipse, rgba(77,232,224,.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border: 1px solid rgba(77,232,224,.35);
+  border-radius: 20px;
+  background: rgba(77,232,224,.06);
+  color: var(--cyan);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  margin-bottom: 28px;
+}
+.hero-label::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;}50%{opacity:.3;} }
+
+.hero h1 {
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 900;
+  line-height: 1.15;
+  margin-bottom: 20px;
+  letter-spacing: -.01em;
+}
+.hero h1 .grad {
+  background: linear-gradient(90deg, var(--cyan) 0%, #a0f0ec 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: clamp(16px, 2vw, 22px);
+  color: var(--gray1);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.hero-note {
+  font-size: 14px;
+  color: var(--gray2);
+  margin-bottom: 60px;
+}
+.hero-note span {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+/* CHECKER GRID */
+.checker-section {
+  position: relative; z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px 120px;
+}
+.checker-section-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--gray2);
+  text-align: center;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+}
+.checker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.checker-card {
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 24px;
+  padding: 36px 32px;
+  text-decoration: none;
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+  position: relative;
+  overflow: hidden;
+}
+.checker-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(0,0,0,.4);
+}
+.checker-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: 24px 24px 0 0;
+}
+.checker-card.ai::before   { background: linear-gradient(90deg, var(--cyan), var(--purple)); }
+.checker-card.ai:hover     { border-color: rgba(77,232,224,.3); box-shadow: 0 16px 48px rgba(77,232,224,.12); }
+.checker-card.pop::before  { background: linear-gradient(90deg, var(--pink), #ffb0d8); }
+.checker-card.pop:hover    { border-color: rgba(255,110,180,.3); box-shadow: 0 16px 48px rgba(255,110,180,.12); }
+.checker-card.work::before { background: linear-gradient(90deg, var(--green), var(--orange)); }
+.checker-card.work:hover   { border-color: rgba(61,212,170,.3); box-shadow: 0 16px 48px rgba(61,212,170,.12); }
+
+.card-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  line-height: 1;
+}
+.card-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  margin-bottom: 12px;
+  width: fit-content;
+}
+.checker-card.ai   .card-badge { background: rgba(77,232,224,.12); color: var(--cyan); border: 1px solid rgba(77,232,224,.25); }
+.checker-card.pop  .card-badge { background: rgba(255,110,180,.12); color: var(--pink); border: 1px solid rgba(255,110,180,.25); }
+.checker-card.work .card-badge { background: rgba(61,212,170,.12); color: var(--green); border: 1px solid rgba(61,212,170,.25); }
+
+.card-title {
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.card-desc {
+  font-size: 14px;
+  color: var(--gray1);
+  line-height: 1.7;
+  flex-grow: 1;
+  margin-bottom: 24px;
+}
+.card-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+.card-type-chip {
+  font-size: 12px;
+  padding: 3px 10px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  color: var(--gray2);
+}
+.card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  width: fit-content;
+  transition: transform .15s;
+  text-decoration: none;
+}
+.checker-card.ai   .card-cta { background: rgba(77,232,224,.12); color: var(--cyan); border: 1px solid rgba(77,232,224,.25); }
+.checker-card.pop  .card-cta { background: rgba(255,110,180,.12); color: var(--pink); border: 1px solid rgba(255,110,180,.25); }
+.checker-card.work .card-cta { background: rgba(61,212,170,.12); color: var(--green); border: 1px solid rgba(61,212,170,.25); }
+.card-cta::after { content: '→'; }
+.checker-card:hover .card-cta { transform: translateX(4px); }
+
+.card-meta {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--gray2);
+}
+
+/* AND MORE */
+.coming-card {
+  background: var(--bg2);
+  border: 1px dashed rgba(255,255,255,.15);
+  border-radius: 24px;
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 280px;
+}
+.coming-icon { font-size: 36px; margin-bottom: 16px; opacity: .4; }
+.coming-title { font-size: 18px; font-weight: 900; color: var(--gray2); margin-bottom: 8px; }
+.coming-desc { font-size: 13px; color: var(--gray2); line-height: 1.6; }
+.coming-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 16px;
+}
+.coming-chip {
+  font-size: 12px;
+  padding: 4px 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  color: var(--gray2);
+}
+
+/* SINC CTA */
+.sinc-section {
+  position: relative; z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+.sinc-banner {
+  background: linear-gradient(135deg, rgba(77,232,224,.06) 0%, rgba(144,96,255,.08) 100%);
+  border: 1px solid rgba(77,232,224,.2);
+  border-radius: 24px;
+  padding: 48px 40px;
+  text-align: center;
+}
+.sinc-logo { font-size: 32px; font-weight: 900; background: linear-gradient(90deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+.sinc-tagline { font-size: 13px; color: var(--cyan); font-weight: 700; letter-spacing: .06em; margin-bottom: 16px; }
+.sinc-desc { font-size: 16px; color: var(--gray1); line-height: 1.8; margin-bottom: 28px; }
+.sinc-desc strong { color: var(--white); }
+.btn-sinc { display: inline-flex; align-items: center; gap: 10px; padding: 16px 48px; background: linear-gradient(135deg, var(--cyan), var(--cyan2)); color: #07070e; font-size: 16px; font-weight: 900; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; font-family: 'Noto Sans JP', sans-serif; box-shadow: 0 0 28px rgba(77,232,224,.25); transition: transform .2s, box-shadow .2s; }
+.btn-sinc:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(77,232,224,.4); }
+.btn-sinc::after { content: '→'; }
+
+/* FOOTER */
+footer {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 32px 24px 48px;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+footer a { font-size: 14px; color: var(--gray2); text-decoration: none; transition: color .15s; }
+footer a:hover { color: var(--gray1); }
+footer .sep { margin: 0 12px; color: var(--gray2); }
+
+@media (max-width: 640px) {
+  .hero { padding: 72px 20px 60px; }
+  .checker-grid { grid-template-columns: 1fr; }
+  .sinc-banner { padding: 32px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-label">STRATAIX CHECKER SERIES</div>
+  <h1>自分を知る、<br><span class="grad">無料の診断ツール集。</span></h1>
+  <p class="hero-sub">気になるテーマを選んで、今すぐ診断。<br>結果は画像でシェアできます。</p>
+  <p class="hero-note">
+    <span>無料</span>
+    <span>登録不要</span>
+    <span>毎週1本追加予定</span>
+  </p>
+</div>
+
+<div class="checker-section">
+  <div class="checker-section-label">— CHECKERS —</div>
+  <div class="checker-grid">
+
+    <!-- AI Work -->
+    <a href="./ai-work/" class="checker-card ai">
+      <div class="card-icon">🤖</div>
+      <div class="card-badge">AI WORK</div>
+      <div class="card-title">AIワーク相性チェッカー</div>
+      <p class="card-desc">習熟度 × 興味度の組み合わせで、16タイプのあなたのAIワーカースタイルが分かる。</p>
+      <div class="card-types">
+        <span class="card-type-chip">🚀 AIネイティブ型</span>
+        <span class="card-type-chip">🎯 現場の実践者型</span>
+        <span class="card-type-chip">🌈 夢見るAI信者型</span>
+        <span class="card-type-chip">他13タイプ</span>
+      </div>
+      <span class="card-cta">診断する</span>
+      <div class="card-meta">16問 / 約3分</div>
+    </a>
+
+    <!-- 好かれ度 -->
+    <a href="./moterudo/" class="checker-card pop">
+      <div class="card-icon">🌟</div>
+      <div class="card-badge">POPULAR</div>
+      <div class="card-title">好かれ度チェッカー</div>
+      <p class="card-desc">あなたが人に好かれるとき、どんなスタイルで好かれているのか。5タイプで分かる。</p>
+      <div class="card-types">
+        <span class="card-type-chip">🌟 天然好かれ型</span>
+        <span class="card-type-chip">🤝 深く好かれ型</span>
+        <span class="card-type-chip">🔮 謎の引力型</span>
+        <span class="card-type-chip">他2タイプ</span>
+      </div>
+      <span class="card-cta">診断する</span>
+      <div class="card-meta">12問 / 約2分</div>
+    </a>
+
+    <!-- 職場適性 -->
+    <a href="./shokuba/" class="checker-card work">
+      <div class="card-icon">💼</div>
+      <div class="card-badge">WORKPLACE</div>
+      <div class="card-title">職場適性チェッカー</div>
+      <p class="card-desc">変化への適応 × 協調スタイルから、あなたが本当に力を発揮できる働き方が分かる。</p>
+      <div class="card-types">
+        <span class="card-type-chip">🔥 スタートアップ型</span>
+        <span class="card-type-chip">🚀 フリーランス型</span>
+        <span class="card-type-chip">💻 専門職型</span>
+        <span class="card-type-chip">他2タイプ</span>
+      </div>
+      <span class="card-cta">診断する</span>
+      <div class="card-meta">12問 / 約2分</div>
+    </a>
+
+    <!-- and more -->
+    <div class="coming-card">
+      <div class="coming-icon">✦</div>
+      <div class="coming-title">and more...</div>
+      <p class="coming-desc">新しいチェッカーを準備中。<br>毎週1本ペースで追加していきます。</p>
+      <div class="coming-chips">
+        <span class="coming-chip">ストレス対処タイプ</span>
+        <span class="coming-chip">コミュ力タイプ</span>
+        <span class="coming-chip">恋愛スタイル</span>
+        <span class="coming-chip">??</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="sinc-section">
+  <div class="sinc-banner">
+    <div class="sinc-logo">Sinc</div>
+    <div class="sinc-tagline">性格診断 × マッチング</div>
+    <p class="sinc-desc">
+      チェッカーで自分のタイプを知ったら、次は<strong>相性のいい人と繋がる</strong>番。<br>
+      Sincは性格診断をベースに、本当に合う人と出会えるコミュニティです。
+    </p>
+    <a href="https://sinc.strataix.net" target="_blank" rel="noopener" class="btn-sinc">
+      Sincを試してみる
+    </a>
+  </div>
+</div>
+
+<footer>
+  <a href="https://strataix.net" target="_blank" rel="noopener">StratAIX</a>
+  <span class="sep">|</span>
+  <a href="https://sinc.strataix.net" target="_blank" rel="noopener">Sinc</a>
+  <span class="sep">|</span>
+  <a href="https://x.com/StratAIX_AI" target="_blank" rel="noopener">@StratAIX_AI</a>
+</footer>
+
+</body>
+</html>
