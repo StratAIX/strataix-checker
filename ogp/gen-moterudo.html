@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>OGP Generator — 好かれ度チェッカー</title>
+<style>
+body { background:#222; display:flex; flex-direction:column; align-items:center; padding:32px; font-family:sans-serif; }
+canvas { border:1px solid #444; display:block; }
+button { margin-top:16px; padding:12px 32px; background:#e03a90; color:#fff; border:none; border-radius:8px; font-size:16px; font-weight:900; cursor:pointer; }
+p { color:#999; font-size:13px; margin-top:8px; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1200" height="630"></canvas>
+<button onclick="dl()">⬇ moterudo-ogp.png をダウンロード</button>
+<p>保存したら strataix-checkers/ogp/ フォルダに格納してください</p>
+<script>
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+const W = 1200, H = 630;
+
+// 背景（ライトピンク）
+const bg = ctx.createLinearGradient(0,0,W,H);
+bg.addColorStop(0,'#fff0f8'); bg.addColorStop(0.5,'#fde4f4'); bg.addColorStop(1,'#f8d0ee');
+ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+// ドット柄
+ctx.fillStyle='rgba(224,58,144,0.07)';
+for(let x=24;x<W;x+=48) for(let y=24;y<H;y+=48){
+  ctx.beginPath(); ctx.arc(x,y,2.5,0,Math.PI*2); ctx.fill();
+}
+
+// グロー
+const glow=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,380);
+glow.addColorStop(0,'rgba(255,120,200,0.15)'); glow.addColorStop(1,'rgba(255,120,200,0)');
+ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
+
+// 上部アクセントライン
+const topLine=ctx.createLinearGradient(0,0,W,0);
+topLine.addColorStop(0,'rgba(224,58,144,0)');
+topLine.addColorStop(0.3,'#e03a90');
+topLine.addColorStop(0.7,'#ff80c0');
+topLine.addColorStop(1,'rgba(224,58,144,0)');
+ctx.fillStyle=topLine; ctx.fillRect(0,0,W,6);
+
+// バッジ
+ctx.fillStyle='rgba(224,58,144,0.1)';
+roundRectFill(ctx,72,62,220,36,18);
+ctx.strokeStyle='rgba(224,58,144,0.4)'; ctx.lineWidth=1;
+roundRectStroke(ctx,72,62,220,36,18);
+ctx.font='700 15px sans-serif'; ctx.fillStyle='#e03a90';
+ctx.textAlign='left'; ctx.fillText('POPULAR CHECKER', 90, 86);
+
+// メインタイトル
+ctx.font='900 74px sans-serif';
+const tg=ctx.createLinearGradient(72,0,700,0);
+tg.addColorStop(0,'#e03a90'); tg.addColorStop(1,'#ff80c0');
+ctx.fillStyle=tg; ctx.textAlign='left';
+ctx.fillText('好かれ度チェッカー', 72, 210);
+
+// サブタイトル
+ctx.font='500 28px sans-serif'; ctx.fillStyle='rgba(30,14,21,0.55)';
+ctx.fillText('あなた、思ってるより好かれてます。12問で証明します。', 72, 264);
+
+// 区切り線
+ctx.strokeStyle='rgba(224,58,144,0.2)'; ctx.lineWidth=1;
+ctx.beginPath(); ctx.moveTo(72,294); ctx.lineTo(W-72,294); ctx.stroke();
+
+// タイプ表示（3つ）
+const types = [
+  {icon:'🌟', name:'天然好かれ型', sub:'自然と人が集まる'},
+  {icon:'🔮', name:'謎の引力型', sub:'なぜか気になる存在'},
+  {icon:'🦔', name:'隠れた魅力型', sub:'まだ本領発揮前'},
+];
+types.forEach((t,i) => {
+  const x = 72 + i * 356;
+  const y = 320;
+  ctx.fillStyle='rgba(224,58,144,0.07)';
+  roundRectFill(ctx,x,y,330,108,16);
+  ctx.strokeStyle='rgba(224,58,144,0.18)'; ctx.lineWidth=1;
+  roundRectStroke(ctx,x,y,330,108,16);
+  ctx.font='44px serif'; ctx.textAlign='center';
+  ctx.fillText(t.icon, x+52, y+66);
+  ctx.font='700 24px sans-serif'; ctx.fillStyle='#c02878';
+  ctx.textAlign='left'; ctx.fillText(t.name, x+96, y+56);
+  ctx.font='500 16px sans-serif'; ctx.fillStyle='rgba(30,14,21,0.4)';
+  ctx.fillText(t.sub, x+96, y+84);
+});
+
+// 下部情報
+ctx.font='700 20px sans-serif'; ctx.fillStyle='rgba(224,58,144,0.55)';
+ctx.textAlign='left'; ctx.fillText('無料・登録不要・12問', 72, H-44);
+ctx.font='500 18px sans-serif'; ctx.fillStyle='rgba(30,14,21,0.2)';
+ctx.textAlign='right'; ctx.fillText('checker.strataix.net/moterudo/', W-72, H-44);
+ctx.font='700 18px sans-serif'; ctx.fillStyle='rgba(224,58,144,0.35)';
+ctx.fillText('Sinc by StratAIX', W-72, H-72);
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+function roundRectFill(ctx,x,y,w,h,r){roundRect(ctx,x,y,w,h,r);ctx.fill();}
+function roundRectStroke(ctx,x,y,w,h,r){roundRect(ctx,x,y,w,h,r);ctx.stroke();}
+
+function dl(){
+  const a=document.createElement('a');
+  a.download='moterudo-ogp.png';
+  a.href=cv.toDataURL('image/png');
+  a.click();
+}
+</script>
+</body>
+</html>

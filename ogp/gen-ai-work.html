@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>OGP Generator — AIワーク相性チェッカー</title>
+<style>
+body { background:#222; display:flex; flex-direction:column; align-items:center; padding:32px; font-family:sans-serif; }
+canvas { border:1px solid #444; display:block; }
+button { margin-top:16px; padding:12px 32px; background:#4DE8E0; color:#07070e; border:none; border-radius:8px; font-size:16px; font-weight:900; cursor:pointer; }
+p { color:#999; font-size:13px; margin-top:8px; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1200" height="630"></canvas>
+<button onclick="dl()">⬇ ai-work-ogp.png をダウンロード</button>
+<p>保存したら strataix-checkers/ogp/ フォルダに格納してください</p>
+<script>
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+const W = 1200, H = 630;
+
+// 背景
+const bg = ctx.createLinearGradient(0,0,W,H);
+bg.addColorStop(0,'#07070e'); bg.addColorStop(1,'#0d1220');
+ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+// グリッド
+ctx.strokeStyle='rgba(77,232,224,0.06)'; ctx.lineWidth=1;
+for(let x=0;x<W;x+=48){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+for(let y=0;y<H;y+=48){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+// グロー
+const glow=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,420);
+glow.addColorStop(0,'rgba(77,232,224,0.1)'); glow.addColorStop(1,'rgba(77,232,224,0)');
+ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
+
+// 左アクセントライン
+ctx.fillStyle='#4DE8E0'; ctx.fillRect(48,60,4,H-120);
+
+// バッジ
+ctx.fillStyle='rgba(77,232,224,0.1)';
+roundRect(ctx,72,68,220,36,18); ctx.fill();
+ctx.strokeStyle='rgba(77,232,224,0.4)'; ctx.lineWidth=1;
+roundRect(ctx,72,68,220,36,18); ctx.stroke();
+ctx.font='700 15px sans-serif'; ctx.fillStyle='#4DE8E0';
+ctx.textAlign='left'; ctx.fillText('AI WORK CHECKER', 90, 92);
+
+// メインタイトル
+ctx.font='900 74px sans-serif';
+const tg=ctx.createLinearGradient(72,0,600,0);
+tg.addColorStop(0,'#4DE8E0'); tg.addColorStop(1,'#a0f8f4');
+ctx.fillStyle=tg; ctx.textAlign='left';
+ctx.fillText('AIワーク相性チェッカー', 72, 210);
+
+// サブタイトル
+ctx.font='500 28px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.65)';
+ctx.fillText('あなた、AIに使われてる？ それとも使いこなしてる？', 72, 264);
+
+// 区切り線
+ctx.strokeStyle='rgba(77,232,224,0.2)'; ctx.lineWidth=1;
+ctx.beginPath(); ctx.moveTo(72,294); ctx.lineTo(W-72,294); ctx.stroke();
+
+// タイプ表示（3つ）
+const types = [
+  {icon:'🚀', name:'AIネイティブ型', color:'#4DE8E0'},
+  {icon:'⚡', name:'止まれない加速型', color:'#a0e8ff'},
+  {icon:'🎯', name:'現場の実践者型', color:'#80d8d0'},
+];
+types.forEach((t,i) => {
+  const x = 72 + i * 356;
+  const y = 320;
+  ctx.fillStyle='rgba(77,232,224,0.07)';
+  roundRectFill(ctx, x, y, 330, 108, 16);
+  ctx.strokeStyle='rgba(77,232,224,0.2)'; ctx.lineWidth=1;
+  roundRectStroke(ctx, x, y, 330, 108, 16);
+  ctx.font='44px serif'; ctx.textAlign='center';
+  ctx.fillText(t.icon, x+52, y+66);
+  ctx.font='700 24px sans-serif'; ctx.fillStyle=t.color;
+  ctx.textAlign='left'; ctx.fillText(t.name, x+96, y+58);
+  ctx.font='500 16px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.35)';
+  ctx.fillText('など 16タイプ', x+96, y+86);
+});
+
+// 下部情報
+ctx.font='700 20px sans-serif'; ctx.fillStyle='rgba(77,232,224,0.5)';
+ctx.textAlign='left'; ctx.fillText('無料・登録不要・16問', 72, H-44);
+ctx.font='500 18px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.2)';
+ctx.textAlign='right'; ctx.fillText('checker.strataix.net/ai-work/', W-72, H-44);
+
+// Sinc by StratAIX
+ctx.font='700 18px sans-serif'; ctx.fillStyle='rgba(77,232,224,0.35)';
+ctx.textAlign='right'; ctx.fillText('Sinc by StratAIX', W-72, H-72);
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+function roundRectFill(ctx,x,y,w,h,r){roundRect(ctx,x,y,w,h,r);ctx.fill();}
+function roundRectStroke(ctx,x,y,w,h,r){roundRect(ctx,x,y,w,h,r);ctx.stroke();}
+
+function dl(){
+  const a=document.createElement('a');
+  a.download='ai-work-ogp.png';
+  a.href=cv.toDataURL('image/png');
+  a.click();
+}
+</script>
+</body>
+</html>
