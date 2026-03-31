@@ -1225,7 +1225,8 @@ async function shareToX() {
     const file = new File([blob], 'ai-work-checker.png', { type: 'image/png' });
 
     // モバイル: Web Share API（画像付きでXに直接シェア）
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({ files: [file], text: shareText });
         return;

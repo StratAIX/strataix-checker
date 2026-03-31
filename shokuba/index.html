@@ -464,7 +464,8 @@ async function shareToX() {
   const xUrl='https://x.com/intent/tweet?text='+encodeURIComponent(shareText);
   cv.toBlob(async(blob)=>{
     const file=new File([blob],'shokuba-checker.png',{type:'image/png'});
-    if(navigator.canShare&&navigator.canShare({files:[file]})){
+    const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if(isMobile&&navigator.canShare&&navigator.canShare({files:[file]})){
       try{await navigator.share({files:[file],text:shareText});return;}
       catch(e){if(e.name==='AbortError')return;}
     }

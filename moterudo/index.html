@@ -624,7 +624,8 @@ async function shareToX() {
     const file = new File([blob], 'moterudo-checker.png', { type: 'image/png' });
 
     // モバイル: Web Share API（画像+テキスト同時共有）
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
       try { await navigator.share({ files: [file], text: shareText }); return; }
       catch(e) { if (e.name === 'AbortError') return; }
     }
